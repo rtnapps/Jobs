@@ -42,7 +42,29 @@ while True:
             #print(response_2.content)
             #print(response_2.status_code)
             if response_2.status_code == 200:
-                root_2 = ET.fromstring(response_2.content)
+                response_text = response_2.content.strip()
+
+                if not response_text:
+                    print("⚠️ Empty response from Verifone. Skipping this cycle.")
+                    time.sleep(60)
+                    continue
+
+                if not response_text.startswith(b"<"):
+                    print("⚠️ Non-XML response received:")
+                    print(response_text[:200])
+                    time.sleep(60)
+                    continue
+
+
+                # root_2 = ET.fromstring(response_2.content)
+                # root_2 = ET.fromstring(response_text)
+                try:
+                    root_2 = ET.fromstring(response_text)
+                except ET.ParseError as e:
+                    print("❌ XML Parse Error:", e)
+                    print(response_text[:300])
+                    time.sleep(60)
+                    continue
 
                 # Define the namespace
                 ns = {'nax': 'http://www.naxml.org/POSBO/Vocabulary/2003-10-16'}
